@@ -871,9 +871,10 @@ function Hero({ t, scrollTo, sectionRef, videoSrc, posterSrc }) {
             "linear-gradient(to right, #fff 1px, transparent 1px), linear-gradient(to bottom, #fff 1px, transparent 1px)",
           backgroundSize: "48px 48px",
         }}
+        
       />
       <motion.div
-        initial={{ scaleX: 0 }}
+        initial= {{ scaleX: 0 }}
         animate={{ scaleX: 1 }}
         transition={{ duration: 1.4, ease: "easeInOut" }}
         className="absolute top-24 left-0 right-0 h-px origin-left"
