@@ -844,15 +844,16 @@ function Hero({ t, scrollTo, sectionRef, videoSrc, posterSrc }) {
       <motion.div style={{ y: videoY }} className="absolute inset-0 -top-[10%] h-[120%]">
         {videoSrc && (
           <video
-            className="w-full h-full object-cover"
-            autoPlay
-            muted
-            loop
-            playsInline
-            poster={posterSrc}
-          >
-            <source src={videoSrc} type="video/mp4" />
-          </video>
+  className="w-full h-full object-cover"
+  autoPlay={true}
+  loop={true}
+  muted={true}
+  playsInline={true}
+  preload="auto"
+  poster={posterSrc}
+>
+  <source src={videoSrc} type="video/mp4" />
+</video>
         )}
         {!videoSrc && posterSrc && (
           <img src={posterSrc} alt="" className="w-full h-full object-cover" />
