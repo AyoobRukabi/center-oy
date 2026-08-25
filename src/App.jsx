@@ -661,7 +661,7 @@ export default function CenterOy() {
             sectionRef={sectionRefs.construction}
             service="construction"
             t={t}
-            reverse={false}
+            index={0}
             imageSrc={constructionImg}
           />
           <ServiceSection
@@ -669,7 +669,7 @@ export default function CenterOy() {
             sectionRef={sectionRefs.cleaning}
             service="cleaning"
             t={t}
-            reverse={true}
+            index={1}
             imageSrc={cleaningImg}
           />
           <ServiceSection
@@ -677,7 +677,7 @@ export default function CenterOy() {
             sectionRef={sectionRefs.floors}
             service="flooring"
             t={t}
-            reverse={false}
+            index={2}
             imageSrc={flooringImg}
           />
 
@@ -1044,15 +1044,17 @@ function ServiceHub({ t, activeService, setActiveService, theme }) {
 }
 
 /* ------------------------------------------------------------------ */
-/*  DETAILED SERVICE SECTION — text + prominent image, side by side     */
-/*  Header + item list slide up on scroll; the image slides in from    */
-/*  the opposite edge and fades in. Hovering the whole section slowly  */
-/*  zooms the image inside its rounded, overflow-hidden frame.         */
+/*  DETAILED SERVICE SECTION — alternating text/image layout,          */
+/*  Remacon-style. Even index: text left, image right. Odd index:     */
+/*  image left, text right. Both columns slide in from opposite edges */
+/*  on scroll; the image/video itself zooms slowly on hover.          */
 /* ------------------------------------------------------------------ */
-function ServiceSection({ id, sectionRef, service, t, reverse = false, imageSrc, videoSrc }) {
+function ServiceSection({ id, sectionRef, service, t, index = 0, imageSrc, videoSrc }) {
   const theme = serviceThemes[service];
   const Icon = theme.icon;
   const data = t.services[service];
+  const isReversed = index % 2 === 1;
+  const slideTransition = { duration: 0.8, ease: [0.16, 1, 0.3, 1] };
 
   return (
     <section
@@ -1063,28 +1065,27 @@ function ServiceSection({ id, sectionRef, service, t, reverse = false, imageSrc,
       <div className="max-w-7xl mx-auto px-6 lg:px-10">
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
           {/* text column */}
-          <div className={reverse ? "lg:order-2" : "lg:order-1"}>
-            <motion.div
-              initial={{ opacity: 0, y: 24 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-80px" }}
-              transition={{ duration: 0.5, ease: "easeOut" }}
-            >
-              <div className="flex items-center gap-3 mb-4">
-                <div
-                  className="w-10 h-10 rounded-lg flex items-center justify-center text-white"
-                  style={{ backgroundColor: theme.accent }}
-                >
-                  <Icon size={20} />
-                </div>
-                <h2 className="font-display text-2xl lg:text-3xl font-bold text-[#0F172A] dark:text-white transition-colors duration-500">
-                  {data.name}
-                </h2>
+          <motion.div
+            initial={{ opacity: 0, x: isReversed ? 60 : -60 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true, margin: "-100px" }}
+            transition={slideTransition}
+            className={isReversed ? "lg:order-last" : "lg:order-first"}
+          >
+            <div className="flex items-center gap-3 mb-4">
+              <div
+                className="w-10 h-10 rounded-lg flex items-center justify-center text-white"
+                style={{ backgroundColor: theme.accent }}
+              >
+                <Icon size={20} />
               </div>
-              <p className="text-slate-500 dark:text-slate-400 max-w-md mb-10 transition-colors duration-500">
-                {data.tagline}
-              </p>
-            </motion.div>
+              <h2 className="font-display text-2xl lg:text-3xl font-bold text-[#0F172A] dark:text-white transition-colors duration-500">
+                {data.name}
+              </h2>
+            </div>
+            <p className="text-slate-500 dark:text-slate-400 max-w-md mb-10 transition-colors duration-500">
+              {data.tagline}
+            </p>
 
             <motion.div
               variants={staggerContainer}
@@ -1114,51 +1115,50 @@ function ServiceSection({ id, sectionRef, service, t, reverse = false, imageSrc,
                 </motion.div>
               ))}
             </motion.div>
-          </div>
+          </motion.div>
 
           {/* image column */}
-          <div
+          <motion.div
+            initial={{ opacity: 0, x: isReversed ? -60 : 60 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true, margin: "-100px" }}
+            transition={slideTransition}
             className={`relative rounded-2xl overflow-hidden aspect-[4/3] lg:aspect-[5/4] shadow-xl shadow-slate-200/60 dark:shadow-black/40 ${
-              reverse ? "lg:order-1" : "lg:order-2"
+              isReversed ? "lg:order-first" : "lg:order-last"
             }`}
           >
-            <motion.div
-              initial={{ opacity: 0, scale: 0.92 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              whileHover={{ scale: 1.05 }}
-              viewport={{ once: true, margin: "-100px" }}
-              transition={{ duration: 0.7, ease: "easeOut" }}
-              className="absolute inset-0"
-            >
-              {videoSrc ? (
-                <video
-                  className="w-full h-full object-cover"
-                  autoPlay
-                  muted
-                  loop
-                  playsInline
-                  poster={imageSrc}
-                >
-                  <source src={videoSrc} type="video/mp4" />
-                </video>
-              ) : (
-                <img
-                  src={imageSrc}
-                  alt={data.name}
-                  loading="lazy"
-                  className="w-full h-full object-cover"
-                />
-              )}
-            </motion.div>
-            <div className="absolute inset-0 bg-gradient-to-t from-black/45 via-black/0 to-transparent" />
-            <div className="absolute inset-0 rounded-2xl ring-1 ring-inset ring-black/5 dark:ring-white/10" />
+            {videoSrc ? (
+              <motion.video
+                whileHover={{ scale: 1.05 }}
+                transition={{ duration: 0.6, ease: "easeOut" }}
+                className="w-full h-full object-cover"
+                autoPlay
+                muted
+                loop
+                playsInline
+                poster={imageSrc}
+              >
+                <source src={videoSrc} type="video/mp4" />
+              </motion.video>
+            ) : (
+              <motion.img
+                whileHover={{ scale: 1.05 }}
+                transition={{ duration: 0.6, ease: "easeOut" }}
+                src={imageSrc}
+                alt={data.name}
+                loading="lazy"
+                className="w-full h-full object-cover"
+              />
+            )}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/45 via-black/0 to-transparent pointer-events-none" />
+            <div className="absolute inset-0 rounded-2xl ring-1 ring-inset ring-black/5 dark:ring-white/10 pointer-events-none" />
             <div
               className="absolute top-5 left-5 w-11 h-11 rounded-xl flex items-center justify-center text-white shadow-lg"
               style={{ backgroundColor: theme.accent }}
             >
               <Icon size={20} />
             </div>
-          </div>
+          </motion.div>
         </div>
       </div>
     </section>
