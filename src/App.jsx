@@ -21,6 +21,9 @@ import {
   Sun,
   Moon,
 } from "lucide-react";
+import constructionImg from "./assets/construction.avif";
+import cleaningImg from "./assets/cleaning.avif";
+import flooringImg from "./assets/flooring.avif";
 
 /* ------------------------------------------------------------------ */
 /*  TRANSLATIONS                                                       */
@@ -465,14 +468,6 @@ const GALLERY_ITEMS = [
   { image: "https://picsum.photos/seed/center-flooring-2/1200/900", service: "flooring", location: "Turku" },
 ];
 
-/* Placeholder hero photography per service section — swap for real
-   project photography whenever available. */
-const serviceImages = {
-  construction: "https://picsum.photos/seed/center-service-construction/1200/1400",
-  cleaning: "https://picsum.photos/seed/center-service-cleaning/1200/1400",
-  flooring: "https://picsum.photos/seed/center-service-flooring/1200/1400",
-};
-
 /* ------------------------------------------------------------------ */
 /*  SHARED: scroll-reveal section header                               */
 /*  Slides up + fades in the first time it enters the viewport.        */
@@ -667,6 +662,7 @@ export default function CenterOy() {
             service="construction"
             t={t}
             reverse={false}
+            imageSrc={constructionImg}
           />
           <ServiceSection
             id="cleaning"
@@ -674,6 +670,7 @@ export default function CenterOy() {
             service="cleaning"
             t={t}
             reverse={true}
+            imageSrc={cleaningImg}
           />
           <ServiceSection
             id="floors"
@@ -681,6 +678,7 @@ export default function CenterOy() {
             service="flooring"
             t={t}
             reverse={false}
+            imageSrc={flooringImg}
           />
 
           <ProjectGallery t={t} />
@@ -1051,7 +1049,7 @@ function ServiceHub({ t, activeService, setActiveService, theme }) {
 /*  the opposite edge and fades in. Hovering the whole section slowly  */
 /*  zooms the image inside its rounded, overflow-hidden frame.         */
 /* ------------------------------------------------------------------ */
-function ServiceSection({ id, sectionRef, service, t, reverse = false }) {
+function ServiceSection({ id, sectionRef, service, t, reverse = false, imageSrc, videoSrc }) {
   const theme = serviceThemes[service];
   const Icon = theme.icon;
   const data = t.services[service];
@@ -1063,7 +1061,7 @@ function ServiceSection({ id, sectionRef, service, t, reverse = false }) {
       className="py-24 bg-[#F8FAFC] dark:bg-[#0F172A] transition-colors duration-500"
     >
       <div className="max-w-7xl mx-auto px-6 lg:px-10">
-        <div className="group grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+        <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
           {/* text column */}
           <div className={reverse ? "lg:order-2" : "lg:order-1"}>
             <motion.div
@@ -1119,21 +1117,39 @@ function ServiceSection({ id, sectionRef, service, t, reverse = false }) {
           </div>
 
           {/* image column */}
-          <motion.div
-            initial={{ opacity: 0, x: reverse ? -60 : 60 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.7, ease: "easeOut" }}
+          <div
             className={`relative rounded-2xl overflow-hidden aspect-[4/3] lg:aspect-[5/4] shadow-xl shadow-slate-200/60 dark:shadow-black/40 ${
               reverse ? "lg:order-1" : "lg:order-2"
             }`}
           >
-            <img
-              src={serviceImages[service]}
-              alt={data.name}
-              loading="lazy"
-              className="w-full h-full object-cover transition-transform duration-[1400ms] ease-out group-hover:scale-110"
-            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.92 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              whileHover={{ scale: 1.05 }}
+              viewport={{ once: true, margin: "-100px" }}
+              transition={{ duration: 0.7, ease: "easeOut" }}
+              className="absolute inset-0"
+            >
+              {videoSrc ? (
+                <video
+                  className="w-full h-full object-cover"
+                  autoPlay
+                  muted
+                  loop
+                  playsInline
+                  poster={imageSrc}
+                >
+                  <source src={videoSrc} type="video/mp4" />
+                </video>
+              ) : (
+                <img
+                  src={imageSrc}
+                  alt={data.name}
+                  loading="lazy"
+                  className="w-full h-full object-cover"
+                />
+              )}
+            </motion.div>
             <div className="absolute inset-0 bg-gradient-to-t from-black/45 via-black/0 to-transparent" />
             <div className="absolute inset-0 rounded-2xl ring-1 ring-inset ring-black/5 dark:ring-white/10" />
             <div
@@ -1142,7 +1158,7 @@ function ServiceSection({ id, sectionRef, service, t, reverse = false }) {
             >
               <Icon size={20} />
             </div>
-          </motion.div>
+          </div>
         </div>
       </div>
     </section>
