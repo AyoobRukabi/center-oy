@@ -21,9 +21,9 @@ import {
   Sun,
   Moon,
 } from "lucide-react";
-import constructionImg from "./assets/construction.avif";
-import cleaningImg from "./assets/cleaning.avif";
-import flooringImg from "./assets/flooring.avif";
+import constructionImg from "./assets/construction.jpg";
+import cleaningImg from "./assets/cleaning.jpg";
+import flooringImg from "./assets/flooring.jpg";
 
 /* ------------------------------------------------------------------ */
 /*  TRANSLATIONS                                                       */
@@ -1055,6 +1055,7 @@ function ServiceSection({ id, sectionRef, service, t, index = 0, imageSrc, video
   const data = t.services[service];
   const isReversed = index % 2 === 1;
   const slideTransition = { duration: 0.8, ease: [0.16, 1, 0.3, 1] };
+  const videoRef = useRef(null);
 
   return (
     <section
@@ -1122,6 +1123,7 @@ function ServiceSection({ id, sectionRef, service, t, index = 0, imageSrc, video
             initial={{ opacity: 0, x: isReversed ? -60 : 60 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true, margin: "-100px" }}
+            onViewportEnter={() => videoRef.current?.play()}
             transition={slideTransition}
             className={`relative rounded-2xl overflow-hidden aspect-[4/3] lg:aspect-[5/4] shadow-xl shadow-slate-200/60 dark:shadow-black/40 ${
               isReversed ? "lg:order-first" : "lg:order-last"
@@ -1129,13 +1131,14 @@ function ServiceSection({ id, sectionRef, service, t, index = 0, imageSrc, video
           >
             {videoSrc ? (
               <motion.video
+                ref={videoRef}
                 whileHover={{ scale: 1.05 }}
                 transition={{ duration: 0.6, ease: "easeOut" }}
                 className="w-full h-full object-cover"
-                autoPlay
                 muted
                 loop
                 playsInline
+                preload="none"
                 poster={imageSrc}
               >
                 <source src={videoSrc} type="video/mp4" />
